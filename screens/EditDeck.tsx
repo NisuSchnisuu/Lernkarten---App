@@ -18,7 +18,6 @@ const EditDeck: React.FC = () => {
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const [deckImageUrl, setDeckImageUrl] = useState('');
-  const [studyMode, setStudyMode] = useState<StudyMode>('sequential');
   const [manualCards, setManualCards] = useState<(Flashcard & {expanded?: boolean})[]>([]);
 
   useEffect(() => {
@@ -26,7 +25,6 @@ const EditDeck: React.FC = () => {
       setName(existingDeck.name);
       setCategory(existingDeck.category);
       setDeckImageUrl(existingDeck.imageUrl || '');
-      setStudyMode(existingDeck.studyMode || 'sequential');
       setManualCards(existingDeck.cards.map((c, i) => ({ 
         ...c, 
         expanded: i === highlightedIndex 
@@ -112,7 +110,6 @@ const EditDeck: React.FC = () => {
         name: name.trim(),
         category: category.trim(),
         cardCount: cards.length,
-        studyMode,
         imageUrl: deckImageUrl,
         cards
       };
@@ -174,23 +171,6 @@ const EditDeck: React.FC = () => {
                 </button>
                 <input type="file" ref={deckImageRef} className="hidden" accept="image/*" onChange={handleDeckImageUpload} />
               </div>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest pl-1">Anzeigemodus</label>
-            <div className="flex bg-background-dark p-1 rounded-xl">
-              <button 
-                onClick={() => setStudyMode('sequential')}
-                className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${studyMode === 'sequential' ? 'bg-primary text-background-dark' : 'text-slate-500'}`}
-              >
-                Der Reihe nach
-              </button>
-              <button 
-                onClick={() => setStudyMode('random')}
-                className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${studyMode === 'random' ? 'bg-primary text-background-dark' : 'text-slate-500'}`}
-              >
-                Zufällig
-              </button>
             </div>
           </div>
         </div>

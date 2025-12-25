@@ -1,12 +1,16 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useApp, playAppSound } from '../App';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useApp } from '../App';
+import { StudyMode } from '../types';
 
 const Quiz: React.FC = () => {
   const { deckId } = useParams();
-  const { decks, updateProgress, audioEnabled } = useApp();
+  const [searchParams] = useSearchParams();
+  const { decks, updateProgress } = useApp();
   const navigate = useNavigate();
+  
+  const selectedMode = (searchParams.get('mode') as StudyMode) || 'sequential';
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -19,19 +23,19 @@ const Quiz: React.FC = () => {
     let baseDeck;
     if (deckId === 'all') {
       const allCards = decks.flatMap(d => d.cards);
-      baseDeck = { id: 'all', name: 'Alle wiederholen', cards: allCards, studyMode: 'random' as const };
+      baseDeck = { id: 'all', name: 'Alle wiederholen', cards: allCards };
     } else {
       baseDeck = decks.find(d => d.id === deckId);
     }
     
     if (!baseDeck) return null;
 
-    const cards = baseDeck.studyMode === 'random' 
+    const cards = selectedMode === 'random' 
       ? [...baseDeck.cards].sort(() => Math.random() - 0.5)
       : [...baseDeck.cards];
 
     return { ...baseDeck, cards };
-  }, [deckId, decks]);
+  }, [deckId, decks, selectedMode]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -56,10 +60,6 @@ const Quiz: React.FC = () => {
   const progress = ((currentIndex + 1) / deck.cards.length) * 100;
 
   const handleRating = (type: 'known' | 'unsure' | 'forgotten') => {
-    if (type === 'known') playAppSound('correct', audioEnabled);
-    else if (type === 'forgotten') playAppSound('incorrect', audioEnabled);
-    else playAppSound('click', audioEnabled);
-
     setResults(prev => ({ ...prev, [type]: prev[type] + 1 }));
     
     if (currentIndex < deck.cards.length - 1) {
@@ -70,11 +70,6 @@ const Quiz: React.FC = () => {
       updateProgress(deck.cards.length, finalKnown, deck.cards.length, deck.id);
       setIsFinished(true);
     }
-  };
-
-  const toggleFlip = () => {
-    playAppSound('flip', audioEnabled);
-    setIsFlipped(!isFlipped);
   };
 
   const getDynamicFontSize = (text: string) => {
@@ -156,7 +151,7 @@ const Quiz: React.FC = () => {
       <main className="flex-1 flex flex-col p-6 overflow-hidden">
         <div 
           className={`flip-card w-full h-full max-h-[600px] cursor-pointer ${isFlipped ? 'flipped' : ''}`}
-          onClick={toggleFlip}
+          onClick={() => setIsFlipped(!isFlipped)}
         >
           <div className="flip-card-inner">
             {/* Front */}

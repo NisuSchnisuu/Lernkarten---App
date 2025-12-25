@@ -13,7 +13,6 @@ const AddDeck: React.FC = () => {
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const [deckImageUrl, setDeckImageUrl] = useState('https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&q=80&w=400');
-  const [studyMode, setStudyMode] = useState<StudyMode>('sequential');
   const [manualCards, setManualCards] = useState<{front: string, back: string, frontImageUrl?: string, backImageUrl?: string}[]>([{front: '', back: ''}]);
   const [errors, setErrors] = useState<{name?: boolean, category?: boolean}>({});
 
@@ -113,7 +112,7 @@ const AddDeck: React.FC = () => {
       mastery: 0,
       accentColor: ['blue', 'red', 'green', 'yellow'][Math.floor(Math.random() * 4)],
       cards,
-      studyMode,
+      studyMode: 'sequential', // Defaulted since it's now session-based
       imageUrl: deckImageUrl
     };
 
@@ -182,23 +181,6 @@ const AddDeck: React.FC = () => {
                 </button>
                 <input type="file" ref={deckImageRef} className="hidden" accept="image/*" onChange={handleDeckImageUpload} />
               </div>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest pl-1">Anzeigemodus</label>
-            <div className="flex bg-background-dark p-1 rounded-xl">
-              <button 
-                onClick={() => setStudyMode('sequential')}
-                className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${studyMode === 'sequential' ? 'bg-primary text-background-dark' : 'text-slate-500'}`}
-              >
-                Der Reihe nach
-              </button>
-              <button 
-                onClick={() => setStudyMode('random')}
-                className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${studyMode === 'random' ? 'bg-primary text-background-dark' : 'text-slate-500'}`}
-              >
-                Zufällig
-              </button>
             </div>
           </div>
         </div>

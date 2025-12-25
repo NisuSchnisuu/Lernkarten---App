@@ -1,12 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../App';
+import { StudyMode } from '../types';
 
 const DeckDetail: React.FC = () => {
   const { id } = useParams();
   const { decks, deleteDeck, t } = useApp();
   const navigate = useNavigate();
+  const [showModeSelection, setShowModeSelection] = useState(false);
   
   const deck = decks.find(d => d.id === id);
 
@@ -24,6 +26,10 @@ const DeckDetail: React.FC = () => {
         deleteDeck(deck.id);
         navigate('/library');
     }
+  };
+
+  const handleStartLearning = (mode: StudyMode) => {
+    navigate(`/quiz/${deck.id}?mode=${mode}`);
   };
 
   const handleExport = () => {
@@ -94,10 +100,51 @@ const DeckDetail: React.FC = () => {
         <div className="h-24"></div>
       </main>
 
+      {showModeSelection && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+            <div className="w-full max-w-md bg-surface-dark rounded-3xl p-8 shadow-2xl animate-in slide-in-from-bottom-8 duration-300 border border-white/5">
+                <h3 className="text-xl font-bold mb-2 text-center">Lernmodus wählen</h3>
+                <p className="text-slate-400 text-sm mb-8 text-center">Wie möchtest du heute lernen?</p>
+                <div className="grid gap-4">
+                    <button 
+                        onClick={() => handleStartLearning('sequential')}
+                        className="flex items-center gap-4 bg-background-dark p-5 rounded-2xl border border-white/10 hover:border-primary/50 transition-all group active:scale-95"
+                    >
+                        <div className="size-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400">
+                            <span className="material-symbols-outlined">format_list_numbered</span>
+                        </div>
+                        <div className="text-left">
+                            <p className="font-bold">Der Reihe nach</p>
+                            <p className="text-[10px] text-slate-500 uppercase font-black">Sequential</p>
+                        </div>
+                    </button>
+                    <button 
+                        onClick={() => handleStartLearning('random')}
+                        className="flex items-center gap-4 bg-background-dark p-5 rounded-2xl border border-white/10 hover:border-primary/50 transition-all group active:scale-95"
+                    >
+                        <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                            <span className="material-symbols-outlined">shuffle</span>
+                        </div>
+                        <div className="text-left">
+                            <p className="font-bold">Zufällig</p>
+                            <p className="text-[10px] text-slate-500 uppercase font-black">Randomized</p>
+                        </div>
+                    </button>
+                </div>
+                <button 
+                    onClick={() => setShowModeSelection(false)}
+                    className="w-full mt-6 py-4 text-slate-500 font-bold uppercase text-[10px] tracking-widest hover:text-white transition-colors"
+                >
+                    Abbrechen
+                </button>
+            </div>
+        </div>
+      )}
+
       <footer className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background-dark via-background-dark pt-10">
         <div className="max-w-md mx-auto">
             <button 
-                onClick={() => navigate(`/quiz/${deck.id}`)}
+                onClick={() => setShowModeSelection(true)}
                 className="w-full bg-primary text-background-dark font-bold py-4 rounded-2xl shadow-xl shadow-primary/30 flex items-center justify-center gap-2 active:scale-95 transition-all"
             >
                 <span className="material-symbols-outlined filled">play_circle</span>
